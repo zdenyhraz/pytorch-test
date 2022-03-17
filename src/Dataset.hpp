@@ -8,7 +8,7 @@ class Dataset : public torch::data::Dataset<Dataset>
 public:
   Dataset()
   {
-    mInputs = torch::linspace(0, 1, 11);
+    mInputs = torch::linspace(0, 1, 256);
     mOutputs = TestFunction(mInputs);
   }
 
