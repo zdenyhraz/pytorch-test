@@ -1,6 +1,6 @@
 torch::Tensor TestFunction(const torch::Tensor& x)
 {
-  return torch::exp(-10. * torch::pow(x - 0.5, 2));
+  return torch::exp(-30. * torch::pow(x - 0.25, 2)) + torch::exp(-30. * torch::pow(x - 0.75, 2));
 }
 
 class Dataset : public torch::data::Dataset<Dataset>

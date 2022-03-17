@@ -5,10 +5,10 @@ struct Net : torch::nn::Module
 
   Net()
   {
-    fc1 = register_module("fc1", torch::nn::Linear(kInputSize, 64));
-    fc2 = register_module("fc2", torch::nn::Linear(64, 32));
-    fc3 = register_module("fc3", torch::nn::Linear(32, 16));
-    fc4 = register_module("fc4", torch::nn::Linear(16, kOutputSize));
+    fc1 = register_module("fc1", torch::nn::Linear(kInputSize, 128));
+    fc2 = register_module("fc2", torch::nn::Linear(128, 64));
+    fc3 = register_module("fc3", torch::nn::Linear(64, 32));
+    fc4 = register_module("fc4", torch::nn::Linear(32, kOutputSize));
   }
 
   torch::Tensor forward(torch::Tensor x)

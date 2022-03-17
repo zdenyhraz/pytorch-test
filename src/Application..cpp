@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-  static constexpr size_t kEpochCount = 300;
+  static constexpr size_t kEpochCount = 1000;
   static constexpr size_t kBatchSize = 16; // dataset size has to be divisible by this
   static constexpr float kLearningRate = 0.01;
   static constexpr bool kSaveNetwork = false;
