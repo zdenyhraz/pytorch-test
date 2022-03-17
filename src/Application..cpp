@@ -4,23 +4,27 @@
 
 int main(int argc, char** argv)
 {
-  static constexpr size_t kEpochCount = 1000;
+  static constexpr size_t kEpochCount = 500;
   static constexpr size_t kBatchSize = 16; // dataset size has to be divisible by this
-  static constexpr float kLearningRate = 0.01;
+  static constexpr float kLearningRate = 0.001;
+
   static constexpr bool kSaveNetwork = false;
   static constexpr size_t kSaveNetworkCount = 5;
   static constexpr bool kLogProgress = true;
   static constexpr size_t kLogProgressCount = 10;
 
   auto net = std::make_shared<Net>();
-  auto dataset = Dataset().map(torch::data::transforms::Stack<>());
+
+  auto dataset = Dataset(256).map(torch::data::transforms::Stack<>());
   auto dataloader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(dataset), kBatchSize);
 
-  torch::optim::SGD optimizer(net->parameters(), kLearningRate);
+  auto datasetTest = Dataset(64).map(torch::data::transforms::Stack<>());
+  auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), *datasetTest.size());
+
+  torch::optim::Adam optimizer(net->parameters(), kLearningRate); // SGD, Adam, ...
 
   for (size_t epochIndex = 0; epochIndex < kEpochCount; ++epochIndex)
   {
-    size_t batchIndex = 0;
     for (auto& batch : *dataloader)
     {
       optimizer.zero_grad();
@@ -28,9 +32,20 @@ int main(int argc, char** argv)
       torch::Tensor loss = torch::mse_loss(prediction, batch.target);
       loss.backward();
       optimizer.step();
+    }
 
-      if (kLogProgress and batchIndex++ == 0 and epochIndex % (kEpochCount / kLogProgressCount) == 0)
-        fmt::print("Epoch {} | Batch {} | Loss {}\n", epochIndex, batchIndex, loss.item<float>());
+    if (kLogProgress and epochIndex % (kEpochCount / kLogProgressCount) == 0)
+    {
+      // evaluate training and test loss on the entire dataset
+      torch::NoGradGuard noGrad;
+
+      torch::Tensor prediction = net->forward(dataloader->begin()->data);
+      torch::Tensor loss = torch::mse_loss(prediction, dataloader->begin()->target);
+
+      torch::Tensor predictionTest = net->forward(dataloaderTest->begin()->data);
+      torch::Tensor lossTest = torch::mse_loss(predictionTest, dataloaderTest->begin()->target);
+
+      fmt::print("Epoch {} | LossTrain {} | LossTest {}\n", epochIndex, loss.item<float>(), lossTest.item<float>());
     }
 
     if (kSaveNetwork and epochIndex % (kEpochCount / kSaveNetworkCount) == 0)

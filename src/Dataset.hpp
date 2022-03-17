@@ -1,18 +1,18 @@
 torch::Tensor TestFunction(const torch::Tensor& x)
 {
-  return torch::exp(-30. * torch::pow(x - 0.25, 2)) + torch::exp(-30. * torch::pow(x - 0.75, 2));
+  return torch::exp(-50. * torch::pow(x - 0.25, 2)) + torch::exp(-50. * torch::pow(x - 0.75, 2));
 }
 
 class Dataset : public torch::data::Dataset<Dataset>
 {
 public:
-  Dataset()
+  Dataset(size_t n)
   {
-    mInputs = torch::linspace(0, 1, 256);
-    mOutputs = TestFunction(mInputs);
+    mInputs = torch::rand(n);
+    mTargets = TestFunction(mInputs);
   }
 
-  torch::data::Example<> get(size_t index) override { return {mInputs[index], mOutputs[index]}; }
+  torch::data::Example<> get(size_t index) override { return {mInputs[index], mTargets[index]}; }
 
   torch::optional<size_t> size() const override
   {
@@ -22,5 +22,5 @@ public:
   }
 
 private:
-  torch::Tensor mInputs, mOutputs;
+  torch::Tensor mInputs, mTargets;
 };

@@ -13,7 +13,6 @@ struct Net : torch::nn::Module
 
   torch::Tensor forward(torch::Tensor x)
   {
-    // x = torch::relu(fc1->forward(x.reshape({x.size(0), kInputSize})));
     // x = torch::dropout(x, /*p=*/0.5, /*train=*/is_training());
     // x = torch::log_softmax(fc3->forward(x), /*dim=*/1);
 
